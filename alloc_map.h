@@ -23,20 +23,24 @@ struct UnresolvedMalloc {
     LogType type;
 };
 
-template<typename TimeValueType>
-using ResolvedMallocVec = std::list<ResolvedMalloc<TimeValueType>>;
+//template<typename TimeValueType>
+using ResolvedMallocVec = std::list<ResolvedMalloc>;
 
-template<typename TimeValueType>
-using UnresolvedMallocVec = std::list<UnresolvedMalloc<TimeValueType>>;
+//template<typename TimeValueType>
+using UnresolvedMallocVec = std::list<UnresolvedMalloc>;
 
-template<typename MallocResolveType, typename std::enable_if<std::is_same_v<MallocResolveType, ResolvedMalloc> || std::is_same_v<MallocResolveType, UnresolvedMalloc>>>
+template<typename MallocResolveType>
 class MallocMap {
     using AtSameMicrosec = std::list<MallocResolveType>;
     using AllMalloc = std::map<TimeValue, AtSameMicrosec>;
     AllMalloc map_;
 public:
-    template<typename std::enable_if<std::is_same_v<MallocResolveType, ResolvedMalloc>>>
+//    template<typename = std::enable_if_t<std::is_same_v<MallocResolveType, ResolvedMalloc>>>
+//    template<>
+//    template<>
+
     void insert(void* address, size_t size, LogType type, TimeValue const& alloc_tv, TimeValue const& free_tv) {
+        static_assert(std::is_same_v<MallocResolveType, ResolvedMalloc>);
         auto match_tv = map_.find(alloc_tv);
         if (match_tv == map_.end()) {
             auto insert_res = map_.insert({alloc_tv, {}});
@@ -46,8 +50,9 @@ public:
         match_tv->second.emplace_back(MallocResolveType{address, size, free_tv, type});
     }
 
-    template<typename std::enable_if<std::is_same_v<MallocResolveType, UnresolvedMalloc>>>
+//    template<typename = std::enable_if_t<std::is_same_v<MallocResolveType, UnresolvedMalloc>>>
     void insert(void* address, size_t size, LogType type, TimeValue const& alloc_tv) {
+        static_assert(std::is_same_v<MallocResolveType, UnresolvedMalloc>);
         auto match_tv = map_.find(alloc_tv);
         if (match_tv == map_.end()) {
             auto insert_res = map_.insert({alloc_tv, {}});
@@ -107,5 +112,7 @@ public:
         return tid_;
     }
 };
+
+
 
 #endif
