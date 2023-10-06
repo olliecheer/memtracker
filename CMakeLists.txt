@@ -12,12 +12,18 @@ FetchContent_MakeAvailable(googletest)
 
 include_directories(${CMAKE_SOURCE_DIR})
 
-add_library(memtracker memtracker.cpp)
-add_library(ringbuf ringbuf.cpp)
-add_library(shmbuf shmbuf.cpp shmbuf.h)
-add_library(printer printer.cpp)
+add_library(memtracker SHARED memtracker.cc)
+set_property(TARGET memtracker PROPERTY POSITION_INDEPENDENT_CODE ON)
 
-link_libraries(printer)
 
-add_subdirectory(test)
-add_executable(data_process data_process.cpp data_process.h)
+
+add_executable(reporter main.cc reporter.cc trace.cc plot.cc free_map.cc)
+
+#add_library(ringbuf ringbuf.cpp)
+#add_library(shmbuf shmbuf.cpp shmbuf.h)
+#add_library(printer printer.cpp)
+#
+#link_libraries(printer)
+#
+#add_subdirectory(test)
+#add_executable(data_process data_process.cpp data_process.h)

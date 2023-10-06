@@ -4,6 +4,7 @@
 #include <sys/types.h>
 #include <cstdint>
 #include <algorithm>
+#include <limits>
 
 
 
@@ -23,8 +24,28 @@ public:
     }
 };
 
+template<>
+class std::less_equal<struct timeval> {
+public:
+    bool operator() (struct timeval const&a, struct timeval const&b) const {
+        return std::less<struct timeval>{}(a, b) || std::equal_to<struct timeval>{}(a, b);
+    }
+};
+
+
+
 using TimeValue = struct timeval;
 using TimeValueLite = decltype(TimeValue::tv_sec);
+
+const TimeValue TimeValueMax = TimeValue {
+    std::numeric_limits<decltype(TimeValue::tv_sec)>::max(),
+    std::numeric_limits<decltype(TimeValue::tv_usec)>::max()
+};
+
+const TimeValue TimeValueMin = TimeValue {
+        std::numeric_limits<decltype(TimeValue::tv_sec)>::min(),
+        std::numeric_limits<decltype(TimeValue::tv_usec)>::min()
+};
 
 template<typename To, typename From>
 class convert_to {
@@ -61,6 +82,7 @@ struct TimeRange {
         using equal_to = std::equal_to<struct timeval>;
         return equal_to{}(begin, other.begin) && equal_to{}(end, other.end);
     }
+
     /* struct timeval begin; */
     /* struct timeval end; */
     /* bool operator<(struct TimeRange const& other) const { */

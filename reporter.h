@@ -14,9 +14,11 @@ struct MallocSymbolized {
 
 class Reporter {
 public:
-    PlotGraph alloc_distribution(uint32_t sum_interval);
-    PlotGraph memory_occupy_distribution(uint32_t sum_interval);
-    PlotGraph leak_distrubution(uint32_t sum_interval);
+    PlotData alloc_distribution(uint32_t sum_interval);
+    PlotData memory_occupy_distribution(uint32_t sum_interval);
+    PlotData leak_distrubution(uint32_t sum_interval);
+
+    void debug_print() const;
 
     std::vector<MallocSymbolized> leak_symbolize(TraceForThread const& traces);
 };
